@@ -1,0 +1,294 @@
+ 
+CREATE TABLE Student ( 
+    StudentID INT PRIMARY KEY, 
+    Name VARCHAR(50) NOT NULL, 
+    Age INT CHECK (Age >= 18), 
+    Email VARCHAR(100) UNIQUE 
+); 
+ 
+Create another table with a foreign key constraint 
+ 
+CREATE TABLE Course ( 
+    CourseID INT PRIMARY KEY, 
+    CourseName VARCHAR(100), 
+    StudentID INT, 
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID) 
+); 
+ 
+Insert rows into the Student table 
+ 
+INSERT INTO Student (StudentID, Name, Age, Email) VALUES (1, 'John Doe', 20, 
+'john@example.com'); 
+INSERT INTO Student (StudentID, Name, Age, Email) VALUES (2, 'Jane Doe', 22, 
+'jane@example.com'); 
+ -- Insert rows into the Course table 
+INSERT INTO Course (CourseID, CourseName, StudentID) VALUES (101, 'Database Systems', 1); 
+INSERT INTO Course (CourseID, CourseName, StudentID) VALUES (102, 'Operating Systems', 2); 
+ 
+Update a row in the Student table 
+ 
+UPDATE Student SET Age = 21 WHERE StudentID = 1; 
+ -- Delete a row from the Course table 
+DELETE FROM Course WHERE CourseID = 102;
+
+
+
+Create a table and insert sample data 
+CREATE TABLE Employee ( 
+EmployeeID INT PRIMARY KEY, 
+Name VARCHAR(50), 
+Department VARCHAR(50), 
+Salary INT 
+); 
+INSERT INTO Employee (EmployeeID, Name, Department, Salary) VALUES (1, 'Alice', 'HR', 50000); 
+INSERT INTO Employee (EmployeeID, Name, Department, Salary) VALUES (2, 'Bob', 'IT', 60000); 
+INSERT INTO Employee (EmployeeID, Name, Department, Salary) VALUES (3, 'Charlie', 'Finance', 
+70000); -- Simple query to retrieve all employees 
+SELECT * FROM Employee; -- Nested query to find employees with salary greater than the average salary 
+SELECT Name, Salary FROM Employee WHERE Salary > (SELECT AVG(Salary) FROM 
+Employee); -- Sub-query to find the employee with the highest salary 
+SELECT Name, Salary FROM Employee WHERE Salary = (SELECT MAX(Salary) FROM 
+Employee);
+
+
+
+PROGRAM: SUB QUERIES, SIMPLE JOIN OPERATIONS, NATURAL, EQUI, AND 
+OUTER JOINS 
+
+Create two tables and insert sample data 
+CREATE TABLE Department ( 
+DepartmentID INT PRIMARY KEY, 
+DepartmentName VARCHAR(50) 
+); 
+CREATE TABLE Employee ( 
+EmployeeID INT PRIMARY KEY, 
+Name VARCHAR(50), 
+DepartmentID INT, 
+FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) 
+); 
+INSERT INTO Department (DepartmentID, DepartmentName) VALUES (1, 'HR'); 
+INSERT INTO Department (DepartmentID, DepartmentName) VALUES (2, 'IT'); 
+INSERT INTO Employee (EmployeeID, Name, DepartmentID) VALUES (1, 'Alice', 1); 
+INSERT INTO Employee (EmployeeID, Name, DepartmentID) VALUES (2, 'Bob', 2); 
+INSERT INTO Employee (EmployeeID, Name, DepartmentID) VALUES (3, 'Charlie', NULL); 
+Simple join operation 
+SELECT Employee.Name, Department.DepartmentName  
+FROM Employee  
+JOIN Department ON Employee.DepartmentID = Department.DepartmentID; 
+Natural join 
+SELECT * FROM Employee NATURAL JOIN Department; 
+Equi join 
+SELECT * FROM Employee, Department WHERE Employee.DepartmentID = 
+Department.DepartmentID; 
+Outer join 
+SELECT Employee.Name, Department.DepartmentName  
+FROM Employee  
+LEFT JOIN Department ON Employee.DepartmentID = Department.DepartmentID;
+
+
+
+PROGRAM: CREATE VIEW, SEQUENCES, AND INDEX FOR DATABASE 
+TABLES
+
+Create a table and insert a large number of records 
+CREATE TABLE Sales ( 
+SaleID INT PRIMARY KEY, 
+ProductName VARCHAR(50), 
+SaleAmount INT 
+); 
+Insert 1000 records into the Sales table 
+Create a view to simplify complex queries 
+CREATE VIEW HighSales AS 
+SELECT * FROM Sales WHERE SaleAmount > 1000; 
+Create a sequence to generate unique SaleIDs 
+CREATE SEQUENCE SaleID_Seq START WITH 1001 INCREMENT BY 1; 
+Create an index on the SaleAmount column 
+CREATE INDEX idx_SaleAmount ON Sales(SaleAmount);
+
+
+PROGRAM: IMPLICIT AND EXPLICIT CURSORS 
+ 
+ Create a table and insert sample data 
+ 
+CREATE TABLE Employee ( 
+    EmployeeID INT PRIMARY KEY, 
+    Name VARCHAR(50), 
+    Salary INT 
+); 
+ 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (1, 'Alice', 50000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (2, 'Bob', 60000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (3, 'Charlie', 70000); 
+ 
+Implicit cursor example 
+ 
+BEGIN 
+    UPDATE Employee SET Salary = Salary + 1000 WHERE EmployeeID = 1; 
+    IF SQL%FOUND THEN 
+        DBMS_OUTPUT.PUT_LINE('Salary updated successfully'); 
+    END IF; 
+END; 
+ 
+ 
+Explicit cursor example 
+ 
+DECLARE 
+    CURSOR emp_cursor IS SELECT Name, Salary FROM Employee; 
+    emp_name Employee.Name%TYPE; 
+    emp_salary Employee.Salary%TYPE; 
+BEGIN 
+    OPEN emp_cursor; 
+    LOOP 
+        FETCH emp_cursor INTO emp_name, emp_salary; 
+        EXIT WHEN emp_cursor%NOTFOUND; 
+        DBMS_OUTPUT.PUT_LINE('Employee: ' || emp_name || ', Salary: ' || emp_salary); 
+    END LOOP; 
+    CLOSE emp_cursor; 
+END;
+
+
+
+PROGRAM: PROCEDURES AND FUNCTIONS
+Create a table and insert sample data 
+CREATE TABLE Employee ( 
+EmployeeID INT PRIMARY KEY, 
+Name VARCHAR(50), 
+Salary INT 
+); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (1, 'Alice', 50000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (2, 'Bob', 60000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (3, 'Charlie', 70000); 
+Create a procedure to update employee salary 
+CREATE OR REPLACE PROCEDURE UpdateSalary(emp_id INT, new_salary INT) IS 
+BEGIN 
+UPDATE Employee SET Salary = new_salary WHERE EmployeeID = emp_id; 
+DBMS_OUTPUT.PUT_LINE('Salary updated successfully'); 
+END; 
+Create a function to calculate the average salary 
+CREATE OR REPLACE FUNCTION GetAverageSalary RETURN NUMBER IS 
+avg_salary NUMBER; 
+BEGIN 
+SELECT AVG(Salary) INTO avg_salary FROM Employee; 
+RETURN avg_salary; 
+END; 
+Call the procedure and function 
+BEGIN 
+UpdateSalary(1, 55000); 
+DBMS_OUTPUT.PUT_LINE('Average Salary: ' || GetAverageSalary()); 
+END;
+
+
+
+
+PROGRAM: TRIGGERS
+Create a table and insert sample data 
+CREATE TABLE Employee ( 
+EmployeeID INT PRIMARY KEY, 
+Name VARCHAR(50), 
+Salary INT 
+); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (1, 'Alice', 50000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (2, 'Bob', 60000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (3, 'Charlie', 70000); 
+Create a trigger to log salary changes 
+CREATE OR REPLACE TRIGGER LogSalaryChange 
+BEFORE UPDATE ON Employee 
+FOR EACH ROW 
+BEGIN 
+DBMS_OUTPUT.PUT_LINE('Old Salary: ' || :OLD.Salary || ', New Salary: ' || :NEW.Salary); 
+END; 
+Test the trigger by updating a salary 
+UPDATE Employee SET Salary = 55000 WHERE EmployeeID = 1;
+
+
+
+
+
+PROGRAM: EXCEPTION HANDLING
+Create a table and insert sample data 
+CREATE TABLE Employee ( 
+EmployeeID INT PRIMARY KEY, 
+Name VARCHAR(50), 
+Salary INT 
+); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (1, 'Alice', 50000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (2, 'Bob', 60000); 
+INSERT INTO Employee (EmployeeID, Name, Salary) VALUES (3, 'Charlie', 70000); 
+PL/SQL block with exception handling 
+DECLARE 
+emp_salary Employee.Salary%TYPE; 
+BEGIN 
+SELECT Salary INTO emp_salary FROM Employee WHERE EmployeeID = 4; 
+DBMS_OUTPUT.PUT_LINE('Salary: ' || emp_salary); 
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN 
+DBMS_OUTPUT.PUT_LINE('Employee not found'); 
+END;
+
+
+
+
+PROGRAM: DATABASE DESIGN USING ER MODELLING, 
+NORMALIZATION, AND IMPLEMENTATION FOR ANY 
+APPLICATION 
+ 
+Create tables based on ER diagram and normalization 
+ 
+CREATE TABLE Student ( 
+    StudentID INT PRIMARY KEY, 
+    Name VARCHAR(50), 
+    DepartmentID INT, 
+    FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) 
+); 
+ 
+CREATE TABLE Department ( 
+    DepartmentID INT PRIMARY KEY, 
+    DepartmentName VARCHAR(50) 
+); 
+ 
+CREATE TABLE Course ( 
+    CourseID INT PRIMARY KEY, 
+    CourseName VARCHAR(100), 
+    DepartmentID INT, 
+    FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) 
+); 
+ 
+Insert sample data 
+ 
+INSERT INTO Department (DepartmentID, DepartmentName) VALUES (1, 'Computer Science'); 
+INSERT INTO Department (DepartmentID, DepartmentName) VALUES (2, 'Electrical Engineering'); 
+ 
+INSERT INTO Student (StudentID, Name, DepartmentID) VALUES (1, 'Alice', 1); 
+INSERT INTO Student (StudentID, Name, DepartmentID) VALUES (2, 'Bob', 2); 
+ 
+INSERT INTO Course (CourseID, CourseName, DepartmentID) VALUES (101, 'Database Systems', 1); 
+INSERT INTO Course (CourseID, CourseName, DepartmentID) VALUES (102, 'Circuit Theory'
+
+
+
+PROGRAM:  NoSQL
+
+// MongoDB (Document-based) 
+db.students.insert({ 
+name: "Alice", 
+age: 20, 
+courses: ["Database Systems", "Operating Systems"] 
+}); 
+// Cassandra (Column-based) 
+CREATE TABLE students ( 
+student_id UUID PRIMARY KEY, 
+name TEXT, 
+age INT, 
+courses LIST<TEXT> 
+); 
+INSERT INTO students (student_id, name, age, courses) VALUES (uuid(), 'Bob', 22, ['Circuit Theory', 
+'Signal Processing']); 
+// Neo4j (Graph-based) 
+CREATE (alice:Student {name: 'Alice', age: 20}); 
+CREATE (bob:Student {name: 'Bob', age: 22}); 
+CREATE (course1:Course {name: 'Database Systems'}); 
+CREATE (course2:Course {name: 'Operating Systems'}); 
+MATCH (a:Student {name: 'Alice'}), (c:Course {name: 'Database Systems'}) CREATE (a)
+[:ENROLLED_IN]->(c);
+
+
